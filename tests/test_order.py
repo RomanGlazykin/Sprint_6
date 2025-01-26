@@ -1,10 +1,10 @@
 import pytest
 from pages.order_page import OrderPage
 import allure
+from locators.main_page_locators import ORDER_BUTTON_TOP, ORDER_BUTTON_BOTTOM
 
-@allure.feature('Order')
-@pytest.mark.parametrize("order_button", ["top", "bottom"])
-@pytest.mark.parametrize("user_data", [
+order_button_locators = [ORDER_BUTTON_TOP, ORDER_BUTTON_BOTTOM]
+user_data_list = [
     {
         "first_name": "Иван",
         "last_name": "Иванов",
@@ -25,24 +25,27 @@ import allure
         "rent_period": "двое суток",
         "comment": "Тестовый заказ 2"
     }
-])
-def test_create_order(main_page_setup, order_button, user_data):
+]
+
+@allure.feature('Order')
+@pytest.mark.parametrize("order_button_locator, user_data", [(button, data)
+for button in order_button_locators
+for data in user_data_list])
+def test_create_order(main_page_setup, order_button_locator, user_data):
     main_page = main_page_setup
     order_page = OrderPage(main_page.driver)
-    if order_button == "top":
-        main_page.click_order_button_top()
-    elif order_button == "bottom":
-        main_page.click_order_button_bottom()
-    order_page.enter_first_name(user_data["first_name"])
-    order_page.enter_last_name(user_data["last_name"])
-    order_page.enter_address(user_data["address"])
-    order_page.enter_metro_station(user_data["metro_station"])
-    order_page.enter_phone_number(user_data["phone_number"])
-    order_page.click_next_button()
-    order_page.enter_date(user_data["date"])
-    order_page.enter_rent_period(user_data["rent_period"])
-    order_page.choose_scooter_color()
-    order_page.enter_comment(user_data["comment"])
-    order_page.click_order_button()
-    order_page.click_accept_order_button()
+
+    main_page.click_order_button(order_button_locator)
+
+    order_page.fill_order_form(
+        user_data["first_name"],
+        user_data["last_name"],
+        user_data["address"],
+        user_data["metro_station"],
+        user_data["phone_number"],
+        user_data["date"],
+        user_data["rent_period"],
+        user_data["comment"]
+    )
+
     assert order_page.is_order_confirmation_popup_displayed(), "Всплывающее окно не появилось"

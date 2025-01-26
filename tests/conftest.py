@@ -16,14 +16,13 @@ def driver():
     yield driver
     driver.quit()
 
-
 @pytest.fixture(scope="function")
 def main_page_setup(driver):
     driver.get(BASE_URL)
-    time.sleep(1)
+    time.sleep(2)
     # Прокручиваем страницу вниз
 
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
+    time.sleep(2)
 
     return MainPage(driver)

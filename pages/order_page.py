@@ -1,11 +1,11 @@
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from locators.order_page_locators import *
+from .base_page import BasePage
+from selenium.webdriver.common.by import By
 
-class OrderPage:
+class OrderPage(BasePage):
     def __init__(self, driver: WebDriver):
-        self.driver = driver
+        super().__init__(driver)
 
         # Локаторы для полей формы заказа
         self.first_name_field = FIRST_NAME_FIELD
@@ -27,49 +27,46 @@ class OrderPage:
         self.order_confirmation_popup = ORDER_CONFIRMATION_POPUP
 
     def enter_first_name(self, first_name):
-        self.driver.find_element(*self.first_name_field).send_keys(first_name)
+        self.fill_field(self.first_name_field, first_name)
 
     def enter_last_name(self, last_name):
-        self.driver.find_element(*self.last_name_field).send_keys(last_name)
+        self.fill_field(self.last_name_field, last_name)
 
     def enter_address(self, address):
-        self.driver.find_element(*self.address_field).send_keys(address)
+        self.fill_field(self.address_field, address)
 
     def enter_metro_station(self, metro_station):
-        self.driver.find_element(*self.metro_station_field).send_keys(metro_station)
-        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//ul[@class='select-search__options']/li[@data-index='0']"))).click()
+        self.fill_field(self.metro_station_field, metro_station)
+        self.click_element((By.XPATH, "//ul[@class='select-search__options']/li[@data-index='0']"))
 
     def enter_phone_number(self, phone_number):
-        self.driver.find_element(*self.phone_number_field).send_keys(phone_number)
+        self.fill_field(self.phone_number_field, phone_number)
 
     def click_next_button(self):
-        self.driver.find_element(*self.next_button).click()
+        self.click_element(self.next_button)
 
     def enter_date(self, date):
-        self.driver.find_element(*self.date_field).send_keys(date)
-        self.driver.find_element(By.XPATH, "//*[@id='root']/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/div/div[2]/div[2]/div[4]/div[7]").click()
+        self.fill_field(self.date_field, date)
+        self.click_element((By.XPATH, "//*[@id='root']/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/div/div[2]/div[2]/div[4]/div[7]"))
 
     def enter_rent_period(self, period):
-        self.driver.find_element(*self.rent_period_field).click()
-        self.driver.find_element(By.XPATH, f"//div[@class='Dropdown-option' and text()='{period}']").click()
+        self.click_element(self.rent_period_field)
+        self.click_element((By.XPATH, f"//div[@class='Dropdown-option' and text()='{period}']"))
 
     def choose_scooter_color(self):
-        self.driver.find_element(*self.scooter_color_field).click()
+        self.click_element(self.scooter_color_field)
 
     def enter_comment(self, comment):
-        self.driver.find_element(*self.comment_field).send_keys(comment)
+        self.fill_field(self.comment_field, comment)
 
     def click_order_button(self):
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(self.order_button))
-        self.driver.find_element(*self.order_button).click()
+        self.click_element(self.order_button)
 
     def click_accept_order_button(self):
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(self.accept_order_button))
-        self.driver.find_element(*self.accept_order_button).click()
+        self.click_element(self.accept_order_button)
 
     def is_order_confirmation_popup_displayed(self):
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(self.order_confirmation_popup))
-        return self.driver.find_element(*self.order_confirmation_popup).is_displayed()
+        return self.is_element_visible(self.order_confirmation_popup)
 
     def fill_order_form(self, first_name, last_name, address, metro_station, phone_number, date, period, comment):
         self.enter_first_name(first_name)
